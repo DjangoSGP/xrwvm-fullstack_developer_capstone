@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = 3030;
 
-app.use(cors())
+app.use(cors());
 app.use(require('body-parser').urlencoded({ extended: false }));
 
 const reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
@@ -22,17 +22,16 @@ const Reviews = require('./review');
 const Dealerships = require('./dealership');
 //const dealership = require('./dealership');
 
-try {
-  Reviews.deleteMany({}).then(()=>{
-    Reviews.insertMany(reviews_data['reviews']);
-  });
-  Dealerships.deleteMany({}).then(()=>{
-    Dealerships.insertMany(dealerships_data['dealerships']);
-  });
-  
-} catch (error) {
-  res.status(500).json({ error: 'Error fetching documents' });
-}
+(async () => {
+  try {
+    await Reviews.deleteMany({});
+    await Reviews.insertMany(reviews_data.reviews);
+    await Dealerships.deleteMany({});
+    await Dealerships.insertMany(dealerships_data.dealerships);
+  } catch (error) {
+    console.error('Error initializing database:', error);
+  }
+})();
 
 
 // Express route to home
